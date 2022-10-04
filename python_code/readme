@@ -1,0 +1,26 @@
+the code solves the internal wave in a 2D front which is undergoing strain-induced frontogenesis.
+The frontogenesis formulation is based on Hoskins and Brethreton (1972).
+
+min_freq belongs to the min frequency IW (commonly known as near-inertial wave) interacting with front
+high_freq belong to high frequency IW (here we consider wave frequency = 1.5*f, f = Coriolis freqeuncy)
+
+The code uses the freely available Dedalus (https://github.com/DedalusProject) framwork to solve the governing PDE.
+Note that Dedalus only the wave part while the frontal solution is based on Hoskins and Brethreton which is
+laregly solved by the hb72.pyx.
+
+### how to run the code
+First we need to compile hb72.pyx which is written in cython (python wrapped with C), 
+to compile please use the below the command line
+"python setup.py build_ext --inplace"
+
+Next, use usual command line to run the pyhton code
+"python hb72_niw.py > output.log&"
+
+the flow data will be written in a folder "flow", and wave data will be writtn in "wave" folder.
+
+To plot the data, we need to merge the files in the folder, which can be achieved by 
+"python merge.py flow/ --cleanup"
+and
+"python merge.py wave/ --cleanup"
+
+
