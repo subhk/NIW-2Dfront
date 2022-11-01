@@ -125,8 +125,8 @@ domain = de.Domain([y_basis, z_basis], grid_dtype=np.float64)
 
 problem=de.IVP(domain, variables=['p','u','v','w','b'], time='t')
 
-problem.meta['b', 'w']['z']['parity'] = -1 
-problem.meta['p', 'u', 'v']['z']['parity'] = 1
+problem.meta['w']['z']['parity'] = -1 
+problem.meta['b', 'p', 'u', 'v']['z']['parity'] = 1
 
 y = domain.grid(0)
 z = domain.grid(1)
@@ -141,12 +141,12 @@ problem.parameters['ampl'] = ampl = -0.06
 problem.parameters['N2'] = N*N
 
 B = domain.new_field()
-B.meta['z']['parity'] = -1
+B.meta['z']['parity'] = 1
 B['g'] = ampl*erf(δ * y)   
 problem.parameters['B'] = B
 
 By = domain.new_field()
-By.meta['z']['parity'] = -1
+By.meta['z']['parity'] = 1
 By['g'] = coeff*np.exp(-δ**2*y**2) 
 problem.parameters['By'] = By
 
@@ -165,6 +165,13 @@ W.meta['z']['parity'] = -1
 W['g'] = 0. 
 problem.parameters['W'] = W
 
+# following is needed to statisfy the same pairty of LHS and RHS 
+# of hydrostatic and buoynacy equations
+c1 = domain.new_field()
+c1.meta['z']['parity'] = -1
+c1['g'] = -1. 
+problem.parameters['c1'] = c1  
+
 problem.substitutions['Δ(β,ν)']    = "ν*d(β, y=2)"
 problem.substitutions['Δ2(β,νh)']  = "νh*d(β, y=4)" 
 problem.substitutions['D(β,ν,νh)'] = "Δ(β,ν) - Δ2(β,νh)"
@@ -175,13 +182,13 @@ problem.substitutions['Σ(α,F)'] = "- α*y*dy(F)"
 problem.add_equation("dy(v) + dz(w) = 0", condition = "(ny != 0) or (nz != 0)")
 problem.add_equation("dt(u) - ν*dz(dz(u)) - D(u,ν,νhw) - f*v + α*u = - RS(V,W,u) - Σ(α,u)")
 problem.add_equation("dt(v) - ν*dz(dz(v)) - D(v,ν,νhw) + dy(p) + f*u - α*v = - RS(V,W,v) - RS(v,w,V) - Σ(α,v)")
-problem.add_equation("dz(p) - b = 0")
-problem.add_equation("dt(b) - ν*dz(dz(b)) - D(b,ν,νhw) + N2*w = - RS(V,W,b) - RS(v,w,B) - Σ(α,b)")
+problem.add_equation("dz(p) = c1*b")
+problem.add_equation("dt(b) - ν*dz(dz(b)) - D(b,ν,νhw) = -c1*N2*w - RS(V,W,b) - RS(v,w,B) - Σ(α,b)")
 problem.add_equation("p  = 0", condition="(nz == 0) and (ny == 0)")
 #####
 
 # Build solver
-solver = problem.build_solver(de.timesteppers.SBDF2)
+solver = problem.build_solver(de.timesteppers.RK443)
 logger.info('Solver built')
 
 # Initial conditions for the wave-part
