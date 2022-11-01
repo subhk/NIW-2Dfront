@@ -126,7 +126,7 @@ domain = de.Domain([y_basis, z_basis], grid_dtype=np.float64)
 problem=de.IVP(domain, variables=['p','u','v','w','b'], time='t')
 
 problem.meta['w']['z']['parity'] = -1 
-problem.meta['b', 'p', 'u', 'v']['z']['parity'] = 1
+problem.meta['p', 'b', 'u', 'v']['z']['parity'] = 1
 
 y = domain.grid(0)
 z = domain.grid(1)
@@ -180,10 +180,10 @@ problem.substitutions['Σ(α,F)'] = "- α*y*dy(F)"
 
 # equations for the wave part
 problem.add_equation("dy(v) + dz(w) = 0", condition = "(ny != 0) or (nz != 0)")
-problem.add_equation("dt(u) - ν*dz(dz(u)) - D(u,ν,νhw) - f*v + α*u = - RS(V,W,u) - Σ(α,u)")
-problem.add_equation("dt(v) - ν*dz(dz(v)) - D(v,ν,νhw) + dy(p) + f*u - α*v = - RS(V,W,v) - RS(v,w,V) - Σ(α,v)")
-problem.add_equation("dz(p) = c1*b")
-problem.add_equation("dt(b) - ν*dz(dz(b)) - D(b,ν,νhw) = -c1*N2*w - RS(V,W,b) - RS(v,w,B) - Σ(α,b)")
+problem.add_equation("dt(u) - ν*dz(dz(u)) - D(u,ν,νhw) - f*v + α*u = - RS(V,W,u) - RS(v,w,U) - Σ(α,u)")
+problem.add_equation("dt(v) - ν*dz(dz(v)) - D(v,ν,νhw) + f*u - α*v + dy(p) = - RS(V,W,v) - RS(v,w,V) - Σ(α,v)")
+problem.add_equation("dt(w) + dz(p) = c1*b")
+problem.add_equation("dt(b) - ν*dz(dz(b)) - D(b,ν,νhw) = -c1*N2*w - RS(V,W,b) - c1*RS(v,w,B) - Σ(α,b)")
 problem.add_equation("p  = 0", condition="(nz == 0) and (ny == 0)")
 #####
 
