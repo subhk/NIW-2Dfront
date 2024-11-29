@@ -5,7 +5,7 @@ min_freq belongs to the min frequency IW (commonly known as near-inertial wave) 
 high_freq belong to high frequency IW (here we consider wave frequency = 1.5*f, f = Coriolis freqeuncy)
 
 The code uses the freely available Dedalus (https://github.com/DedalusProject) framwork to solve the governing PDE.
-Note that Dedalus only the wave part while the frontal solution is based on Hoskins and Brethreton which is
+Note that Dedalus only solves the wave part while the frontal solution is based on Hoskins and Brethreton which is
 laregly solved by the hb72.pyx.
 
 ### how to run the code
